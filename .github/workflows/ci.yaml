@@ -55,7 +55,10 @@ jobs:
           filters: |
             docker-or-gocode:
               - 'Dockerfile'
-              - '*/**.go'
+              - '**/*.go'
+              - 'go.mod'
+              - 'go.sum'
+              - '.github/workflows/**'
 
   docker:
     name: Build multi-arch container image
@@ -70,11 +73,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64,arm
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -92,7 +90,7 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: >
-            linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/arm/v5
+            linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
