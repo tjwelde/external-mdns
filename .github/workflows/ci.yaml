@@ -27,9 +27,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
+      - name: Set up Go
+        uses: actions/setup-go@v7
         with:
+          go-version-file: go.mod
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.15.0
           only-new-issues: true
           problem-matchers: true
 
@@ -48,7 +54,7 @@ jobs:
         with:
           filters: |
             docker-or-gocode:
-              - Dockerfile'
+              - 'Dockerfile'
               - '*/**.go'
 
   docker:
@@ -62,6 +68,9 @@ jobs:
       - golang-ci
       - paths-filter
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
@@ -75,19 +84,15 @@ jobs:
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: |
-            blakec/external-mdns
             ghcr.io/${{ github.repository }}
 
-      - name: Build image and push to local image cache
+      - name: Build image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
           platforms: >
             linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/arm/v5
-          # Load the image into the local image cache instead of pushing it to
-          # a registry. This is useful for testing the image locally.
-          load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
@@ -101,11 +106,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: tj-actions/changed-files@v45
+      - name: Check if markdown files have changed
+        uses: dorny/paths-filter@v4
         id: changed-files
         with:
-          files: '**/*.md'
-          separator: ","
+          list-files: csv
+          filters: |
+            markdown:
+              - '**/*.md'
 
       - name: Lint markdown files
         # This action will only run if there are changed files
@@ -115,9 +123,9 @@ jobs:
         # If there are changed files, it will run and lint them
         # The output of this step will be the list of changed files
         uses: DavidAnson/markdownlint-cli2-action@v19
-        if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed-files.outputs.markdown == 'true'
         with:
-          globs: ${{ steps.changed-files.outputs.all_changed_files }}
+          globs: ${{ steps.changed-files.outputs.markdown_files }}
           separator: ","
 
   yamllint:

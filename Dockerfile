@@ -1,11 +1,11 @@
-FROM --platform=$BUILDPLATFORM golang:1.16 AS build
+FROM --platform=$BUILDPLATFORM golang:1.27 AS build
 
 ARG TARGETOS
 ARG TARGETARCH
 ARG TARGETVARIANT
 
-ADD . /go/src/github.com/blake/external-mdns
-WORKDIR /go/src/github.com/blake/external-mdns
+ADD . /go/src/github.com/tjwelde/external-mdns
+WORKDIR /go/src/github.com/tjwelde/external-mdns
 
 RUN mkdir -p /release/etc &&\
     echo nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin > /release/etc/passwd &&\
@@ -21,9 +21,9 @@ LABEL maintainer="Blake Covarrubias <blake@covarrubi.as>" \
       org.opencontainers.image.authors="Blake Covarrubias <blake@covarrubi.as>" \
       org.opencontainers.image.description="Advertises records for Kubernetes resources over multicast DNS." \
       org.opencontainers.image.licenses="Apache-2.0" \
-      org.opencontainers.image.source="https://github.com/blake/external-mdns" \
+      org.opencontainers.image.source="https://github.com/tjwelde/external-mdns" \
       org.opencontainers.image.title="external-mdns" \
-      org.opencontainers.image.url="https://github.com/blake/external-mdns" \
+      org.opencontainers.image.url="https://github.com/tjwelde/external-mdns" \
       org.opencontainers.image.vendor="Blake Covarrubias"
 
 COPY --from=build /release /
