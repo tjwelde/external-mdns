@@ -54,7 +54,7 @@ jobs:
         with:
           filters: |
             docker-or-gocode:
-              - Dockerfile'
+              - 'Dockerfile'
               - '*/**.go'
 
   docker:
@@ -68,6 +68,9 @@ jobs:
       - golang-ci
       - paths-filter
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
