@@ -55,7 +55,10 @@ jobs:
           filters: |
             docker-or-gocode:
               - 'Dockerfile'
-              - '*/**.go'
+              - '**/*.go'
+              - 'go.mod'
+              - 'go.sum'
+              - '.github/workflows/**'
 
   docker:
     name: Build multi-arch container image
