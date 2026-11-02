@@ -83,16 +83,13 @@ jobs:
           images: |
             ghcr.io/${{ github.repository }}
 
-      - name: Build image and push to local image cache
+      - name: Build image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
           platforms: >
             linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/arm/v5
-          # Load the image into the local image cache instead of pushing it to
-          # a registry. This is useful for testing the image locally.
-          load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
